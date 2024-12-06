@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import './App.css'
+import './App.scss'
 import { auth } from './firebase-config'
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth'
 import TextEditor from './components/TextEditor'
@@ -14,12 +14,5 @@ export default function App() {
     })
   }, [])
 
-  return (
-    <div className='app'>
-      <header>
-        <h1>Zenith Docs</h1>
-      </header>
-      <TextEditor />
-    </div>
-  )
+  return <TextEditor />
 }

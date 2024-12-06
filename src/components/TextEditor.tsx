@@ -15,7 +15,7 @@ export default function TextEditor() {
   const saveContent = throttle(() => {
     if (quillRef.current && isLocalChange.current) {
       const content = quillRef.current.getEditor().getContents()
-      console.log(`Saving content to db: ${content}`)
+      console.log(`Saving content to db: `, content)
 
       setDoc(documentRef, { content: content.ops }, { merge: true })
         .then(() => console.log('Content saved'))
@@ -76,8 +76,6 @@ export default function TextEditor() {
   }, [])
 
   return (
-    <div className='zenith-docs-editor'>
       <ReactQuill ref={quillRef} />
-    </div>
   )
 }
