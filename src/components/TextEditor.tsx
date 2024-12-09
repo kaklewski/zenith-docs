@@ -6,12 +6,11 @@ import 'react-quill/dist/quill.snow.css'
 import { throttle } from 'lodash'
 
 export default function TextEditor() {
-  const quillRef = useRef<any>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
-
+  const quillRef = useRef<any>(null)
   const isLocalChange = useRef<boolean>(false)
-
   const documentRef = doc(db, 'documents', 'sample-doc')
+
   const saveContent = throttle(() => {
     if (quillRef.current && isLocalChange.current) {
       const content = quillRef.current.getEditor().getContents()
@@ -25,40 +24,54 @@ export default function TextEditor() {
     }
   }, 1000)
 
+  // Define toolbar and modules with history and handlers
+  const modules = {
+    toolbar: {
+      container: [
+        [{ header: [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ color: [] }, { background: [] }],
+        [{ script: 'sub' }, { script: 'super' }],
+        [{ align: [] }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'image'],
+        ['clean'],
+      ],
+    },
+  }
+
   useEffect(() => {
     if (quillRef.current) {
-      // Load initial content from the Firestore DB
+      const editor = quillRef.current.getEditor()
+
+      // Load initial content from Firestore
       getDoc(documentRef)
         .then(docSnap => {
           if (docSnap.exists()) {
             const savedContent = docSnap.data().content
-            if (savedContent) {
-              quillRef.current.getEditor().setContents(savedContent)
+            if (savedContent && Array.isArray(savedContent)) {
+              editor.setContents(savedContent, 'silent')
             }
           } else {
-            console.log(`No document found. Starting with an empty editor.`)
+            console.log('No document found. Starting with an empty editor.')
           }
         })
         .catch(console.error)
 
-      // Listen to Firestore for any updates and update locally in real time
+      // Listen for Firestore updates
       const unsubscribe = onSnapshot(documentRef, snapshot => {
         if (snapshot.exists()) {
           const newContent = snapshot.data().content
-
           if (!isEditing) {
-            const editor = quillRef.current.getEditor()
             const currentCursorPosition = editor.getSelection()?.index || 0
-
             editor.setContents(newContent, 'silent')
-            editor.setSelection(currentCursorPosition)
+            editor.setSelection(currentCursorPosition, 0, 'silent')
           }
         }
       })
 
-      // Listen for Local text changes and save it to Firestore
-      const editor = quillRef.current.getEditor()
-      editor.on('text-change', (delta: any, oldDelta: any, source: any) => {
+      // Listen for local changes
+      editor.on('text-change', (_delta: any, _oldDelta: any, source: any) => {
         if (source === 'user') {
           isLocalChange.current = true
           setIsEditing(true)
@@ -75,7 +88,5 @@ export default function TextEditor() {
     }
   }, [])
 
-  return (
-      <ReactQuill ref={quillRef} />
-  )
+  return <ReactQuill modules={modules} ref={quillRef} />
 }
