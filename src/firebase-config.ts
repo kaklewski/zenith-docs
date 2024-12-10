@@ -5,17 +5,19 @@ import { getFirestore } from 'firebase/firestore'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-import { FIREBASE_CONFIG } from '../env.ts'
-
 // Your web app's Firebase configuration
 // Taken from: https://console.firebase.google.com/project/zenith-docs/settings/general/web:NDI0MmMzYWItNTZkZS00ODJkLTk2YTEtMGExYjBlOTljYjQ2
+
+// Provide your own api key
+const firebaseApiKey = import.meta.env.VITE_API_KEY
+
 const firebaseConfig = {
-  apiKey: FIREBASE_CONFIG.apiKey,
-  authDomain: FIREBASE_CONFIG.authDomain,
-  projectId: FIREBASE_CONFIG.projectId,
-  storageBucket: FIREBASE_CONFIG.storageBucket,
-  messagingSenderId: FIREBASE_CONFIG.messagingSenderId,
-  appId: FIREBASE_CONFIG.appId,
+  apiKey: firebaseApiKey,
+  authDomain: 'zenith-docs.firebaseapp.com',
+  projectId: 'zenith-docs',
+  storageBucket: 'zenith-docs.firebasestorage.app',
+  messagingSenderId: '190928213728',
+  appId: '1:190928213728:web:58dc47c5229690ab6fa285',
 }
 
 // Initialize Firebase
